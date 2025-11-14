@@ -1,0 +1,5 @@
+{
+  "name": "EFunds",
+  "description": "A streamlined loan application platform. The app validates a user's phone number and PAN, automatically fetches their credit profile, and uses AI to instantly present personalized loan options from various banks and NBFCs.",
+  "requestFramePermissions": []
+}
