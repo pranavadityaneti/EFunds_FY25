@@ -1,7 +1,6 @@
-// FIX: Add Deno types to resolve "Cannot find name 'Deno'" error.
-// FIX: Updated the Deno types reference to a specific version to resolve TypeScript errors.
-/// <reference types="https://esm.sh/v135/@supabase/functions-js@2.4.1/src/edge-runtime.d.ts" />
-import { createClient } from '@supabase/supabase-js'
+// FIX: Replaced the Deno types reference with a URL from a more reliable CDN (unpkg) to fix errors where the 'Deno' global object was not being recognized by TypeScript.
+/// <reference types="https://unpkg.com/@supabase/functions-js@2.4.1/src/edge-runtime.d.ts" />
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
 Deno.serve(async (req) => {
