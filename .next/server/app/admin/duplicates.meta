@@ -1,0 +1,17 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/(admin)/layout,_N_T_/(admin)/admin/layout,_N_T_/(admin)/admin/duplicates/layout,_N_T_/(admin)/admin/duplicates/page,_N_T_/admin/duplicates"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/!KGFkbWluKQ/admin/duplicates/__PAGE__",
+    "/!KGFkbWluKQ/admin/duplicates",
+    "/!KGFkbWluKQ/admin",
+    "/!KGFkbWluKQ",
+    "/_index",
+    "/_head"
+  ]
+}

@@ -1,0 +1,3 @@
+{
+  "/(customer)/policies/motor/[id]/page": "app/(customer)/policies/motor/[id]/page.js"
+}

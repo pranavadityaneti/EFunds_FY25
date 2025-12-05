@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import {
     LayoutDashboard,
     Users,
@@ -18,12 +17,16 @@ import {
     Menu,
     TrendingUp
 } from 'lucide-react';
-import { User } from '@/types';
-import { cn } from '@/lib/utils';
-import { signOut } from '@/lib/auth';
 
 interface LoanSidebarProps {
-    user: User;
+    user: {
+        id: string;
+        name: string;
+        email?: string;
+        customer_id?: string;
+        avatar_url?: string | null;
+        role?: string;
+    };
     isOpen: boolean;
     onClose: () => void;
 }
@@ -36,8 +39,6 @@ type NavItem = {
 
 export default function LoanSidebar({ user, isOpen, onClose }: LoanSidebarProps) {
     const pathname = usePathname();
-    const router = useRouter();
-    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
     const navItems: NavItem[] = [
         { href: '/loan-dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -63,11 +64,7 @@ export default function LoanSidebar({ user, isOpen, onClose }: LoanSidebarProps)
 
             {/* Sidebar */}
             <aside
-                className={cn(
-                    "fixed left-0 top-0 h-full bg-white border-r border-gray-200 flex flex-col z-50 transition-transform duration-300 ease-in-out",
-                    "w-72",
-                    isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-                )}
+                className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 flex flex-col z-50 transition-transform duration-300 ease-in-out w-72 ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
             >
                 {/* Logo & Close Button */}
                 <div className="flex items-center justify-between px-6 py-6 border-b border-gray-100">
@@ -98,18 +95,10 @@ export default function LoanSidebar({ user, isOpen, onClose }: LoanSidebarProps)
                                 key={item.href}
                                 href={item.href}
                                 onClick={onClose}
-                                className={cn(
-                                    'flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 group',
-                                    isActive
-                                        ? 'bg-loan-primary-50 text-loan-primary-700 shadow-sm'
-                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                )}
+                                className={`flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 group ${isActive ? 'bg-loan-primary-50 text-loan-primary-700 shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
                             >
                                 <Icon
-                                    className={cn(
-                                        "w-5 h-5 mr-3 transition-colors",
-                                        isActive ? "text-loan-primary-600" : "text-gray-400 group-hover:text-gray-600"
-                                    )}
+                                    className={`w-5 h-5 mr-3 transition-colors ${isActive ? "text-loan-primary-600" : "text-gray-400 group-hover:text-gray-600"}`}
                                 />
                                 {item.label}
                             </Link>
@@ -121,66 +110,12 @@ export default function LoanSidebar({ user, isOpen, onClose }: LoanSidebarProps)
                 <div className="mt-auto px-4 py-4 border-t border-gray-100">
                     <div className="flex flex-col items-center text-center space-y-3">
                         {/* Profile Picture */}
-                        <div className="relative group">
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-loan-primary-400 to-loan-primary-600 flex items-center justify-center text-white font-bold text-xl shadow-lg overflow-hidden">
-                                {user.avatar_url ? (
-                                    <img src={user.avatar_url} alt={user.name} className="w-full h-full object-cover" />
-                                ) : (
-                                    user.name.charAt(0).toUpperCase()
-                                )}
-                            </div>
-
-                            {/* Loading Overlay */}
-                            {isUploadingAvatar && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-                                </div>
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-loan-primary-400 to-loan-primary-600 flex items-center justify-center text-white font-bold text-xl shadow-lg overflow-hidden">
+                            {user.avatar_url ? (
+                                <img src={user.avatar_url} alt={user.name} className="w-full h-full object-cover" />
+                            ) : (
+                                user.name.charAt(0).toUpperCase()
                             )}
-
-                            {/* Edit Overlay */}
-                            {!isUploadingAvatar && (
-                                <label
-                                    htmlFor="loan-avatar-upload"
-                                    className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                                >
-                                    <div className="bg-white/20 p-1.5 rounded-full backdrop-blur-sm">
-                                        <UserCircle className="w-5 h-5 text-white" />
-                                    </div>
-                                </label>
-                            )}
-                            <input
-                                id="loan-avatar-upload"
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                disabled={isUploadingAvatar}
-                                onChange={async (e) => {
-                                    const file = e.target.files?.[0];
-                                    if (!file || isUploadingAvatar) return;
-
-                                    setIsUploadingAvatar(true);
-
-                                    try {
-                                        const { uploadAvatar } = await import('@/lib/db');
-                                        const url = await uploadAvatar(user.id, file);
-
-                                        if (url) {
-                                            user.avatar_url = url;
-                                            router.refresh();
-                                            setIsUploadingAvatar(false);
-                                        } else {
-                                            setIsUploadingAvatar(false);
-                                            alert('Failed to upload image.');
-                                        }
-                                    } catch (error) {
-                                        console.error('[Avatar Upload] Error:', error);
-                                        setIsUploadingAvatar(false);
-                                        alert(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
-                                    } finally {
-                                        e.target.value = '';
-                                    }
-                                }}
-                            />
                         </div>
 
                         {/* User Name */}
@@ -205,15 +140,7 @@ export default function LoanSidebar({ user, isOpen, onClose }: LoanSidebarProps)
                                 Profile
                             </Link>
                             <button
-                                onClick={async () => {
-                                    try {
-                                        await signOut();
-                                        router.push('/');
-                                        router.refresh();
-                                    } catch (error) {
-                                        console.error('Error signing out:', error);
-                                    }
-                                }}
+                                onClick={() => alert('Sign out functionality - integrate with your auth system')}
                                 className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
                             >
                                 <LogOut className="w-3.5 h-3.5" />

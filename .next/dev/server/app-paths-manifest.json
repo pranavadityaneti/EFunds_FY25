@@ -1,0 +1,9 @@
+{
+  "/(customer)/dashboard/page": "app/(customer)/dashboard/page.js",
+  "/(loan)/loan-dashboard/leads/page": "app/(loan)/loan-dashboard/leads/page.js",
+  "/(loan)/loan-dashboard/page": "app/(loan)/loan-dashboard/page.js",
+  "/(loan)/loan-dashboard/partners/page": "app/(loan)/loan-dashboard/partners/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/login/page": "app/login/page.js",
+  "/page": "app/page.js"
+}

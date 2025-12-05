@@ -1,26 +1,31 @@
 'use client';
 
 import React, { useState } from 'react';
-import LoanSidebar from '@/components/loan/LoanSidebar';
 import { Menu } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+
+// Temporary mock user - replace with real auth later
+const mockUser = {
+    id: '1',
+    name: 'Demo User',
+    email: 'demo@loanhub.com',
+    customer_id: 'DEMO001',
+    avatar_url: null,
+    role: 'user'
+};
 
 export default function LoanLayout({ children }: { children: React.ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const { user, loading } = useAuth();
-
-    if (loading || !user) {
-        return (
-            <div className="flex items-center justify-center h-screen bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-loan-primary-600"></div>
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-gray-50 flex">
-            {/* Sidebar */}
-            <LoanSidebar user={user} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+            {/* Sidebar - Lazy loaded */}
+            {typeof window !== 'undefined' && (
+                <LoanSidebarClient
+                    user={mockUser}
+                    isOpen={sidebarOpen}
+                    onClose={() => setSidebarOpen(false)}
+                />
+            )}
 
             {/* Main Content */}
             <div className="flex-1 md:ml-72">
@@ -42,5 +47,16 @@ export default function LoanLayout({ children }: { children: React.ReactNode }) 
                 </main>
             </div>
         </div>
+    );
+}
+
+// Client component wrapper for sidebar
+function LoanSidebarClient({ user, isOpen, onClose }: any) {
+    const LoanSidebar = React.lazy(() => import('@/components/loan/LoanSidebar'));
+
+    return (
+        <React.Suspense fallback={<div className="w-72 bg-white border-r" />}>
+            <LoanSidebar user={user} isOpen={isOpen} onClose={onClose} />
+        </React.Suspense>
     );
 }
